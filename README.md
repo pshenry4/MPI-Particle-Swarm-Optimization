@@ -6,7 +6,7 @@ Basic OpenMP template
 To compile and run from command line if you are not on windows:
 ```
 cd src
-g++ main.cpp CStopWatch.cpp
+g++ -fopenmp main.cpp CStopWatch.cpp
 ./a.out
 ```
 or
