@@ -1,6 +1,5 @@
-### OpenMP Template in C++ ###
-
-Basic OpenMP template
+### OpenMP Trapezoidal Rule in C++ using OSC ###
+This code implements a parallel variant of the trapezoidal rule. It also includes a PBS script called trapRule in the Default directory that can be used with Ohio Supercomputing Center for job submission.
 
 ## Getting started ##
 To compile and run from command line if you are not on windows:
