@@ -36,8 +36,8 @@ int main(){
 
     a = 0, b = 16;
 
-    nMin = 1000; nMax = 10001; nStep=1000;
-    threadMin = 1; threadMax = 5; threadStep = 1;
+    nMin = 10000; nMax = 100001; nStep=10000;
+    threadMin = 1; threadMax = 12; threadStep = 1;
 
     for(numThreads=threadMin; numThreads<threadMax; numThreads++){
         for(n=nMin; n<nMax; n+=nStep){
