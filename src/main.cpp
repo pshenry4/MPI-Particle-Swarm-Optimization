@@ -2,66 +2,27 @@
 #include <iostream>
 #include "CStopWatch.h"
 
-double f(double x){
-    double retVal = 0.0;
-
-    retVal = x*x;
-
-    return retVal;
-}
-
-double trap(double a, double b, int n){
-
-    double h, retValue;
-
-    h = (b-a)/n;
-    retValue = (f(a) + f(b))/2.0;
-
-    #pragma omp parallel for reduction(+: retValue) 
-    for(int i=1; i<=n-1; i++){
-        retValue += f(a + i*h);
-    }
-    retValue = h*retValue;
-
-    return retValue;
-}
 
 int main(){
 
-    int numThreads = 4, a, b, n;
     int threadMin, threadMax, threadStep;
-    int nMin, nMax, nStep;
+    int numTrials;
     CStopWatch timer;
-    double result;
 
-    a = 0, b = 16;
 
-    nMin = 10000; nMax = 100000; nStep=10000;
-    threadMin = 1; threadMax = 12; threadStep = 1;
+    threadMin = 1; threadMax = 10; threadStep = 1;
+    numTrials = 10;
 
-    for(numThreads=threadMin; numThreads<=threadMax; numThreads++){
-        for(n=nMin; n<=nMax; n+=nStep){
-            result = 0.0;
+    for(int numThreads=threadMin; numThreads<=threadMax; numThreads++){
+        for(int curTrial=0; curTrial<numTrials; curTrial++){
+            
             omp_set_num_threads(numThreads);
             timer.startTimer();
-            result = trap(a, b, n); 
+            // Call functions here
             timer.stopTimer();
-            std::cout << numThreads << ", " << n << ", " << result << ", " << timer.getElapsedTime() << "\n";
+            std::cout << numThreads << ", " << /** Add Results Output Here **/ << ", " << timer.getElapsedTime() << "\n";
         }
     }
-
-    /*
- * result = 0.0;
-    numThreads = 1;
-    omp_set_num_threads(numThreads);
-    result = serialTrap(a, b, n);
-    std::cout << "Serial Result: " << result << std::endl;
-
-    result = 0.0;
-    numThreads = 4;
-    omp_set_num_threads(numThreads);
-    result = serialTrap(a, b, n);
-    std::cout << "Parallel Result: " << result << std::endl;
-*/
+    
     return 0;
 }
