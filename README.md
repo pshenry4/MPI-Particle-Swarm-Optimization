@@ -1,8 +1,27 @@
 ### OpenMP Template in C++ using OSC ###
 This is a basic template for implementing OpenMP projects in CS 4170/5170
 
+## Starting your own Repo ##
 
-## Getting started ##
+Follow these steps:
+
+1. Create your appropriately named repo on Gitlab.
+
+2. On your local computer: 
+    - if using SSH, run  `git clone -b Template --single-branch git@gitlab.com:rgreen13/openmp.git <DIRECTORY_NAME>`. 
+    - If using HTTPS, run `git clone -b Template --single-branch https://gitlab.com/rgreen13/openmp.git <DIRECTORY_NAME>`
+
+3. `cd <DIRECTORY_NAME>`
+
+4. `git remote remove origin`. This removes the current remote named `origin`.
+
+5. `git remote add origin <URL_OF_YOUR_REPO>`. This adds a new remote that has the address of your repo.
+
+6. `git branch -m master`. This changes the name of the current branch (Template) to master.
+
+6. `git push -u origin master`. This pushes your changes.
+
+## Running ##
 To compile and run from command line if you are not on windows:
 ```
 cd src
