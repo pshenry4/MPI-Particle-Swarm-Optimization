@@ -6,7 +6,7 @@ else
 	CC = g++
 endif
 LIBS = 
-CFLAGS =-O2 -g -Wall -c -fmessage-length=0 
+CFLAGS =-O2 -g -Wall -c -fmessage-length=0 -std=c++11
 OPENMP = -fopenmp
 
 RM := rm -rf
