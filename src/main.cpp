@@ -27,6 +27,10 @@ void countSort(std::vector<int>& a){
 
     n = a.size();
     temp.resize(n);
+
+    #pragma omp parallel default(none) private(count) shared(n, a, temp)
+
+    #pragma omp for
     for(int i=0; i<n; i++){
         count = 0;
         for(int j=0; j<n; j++){
@@ -50,8 +54,8 @@ int main(){
     std::vector<int> result;
 
     threadMin = 1; threadMax = 12; threadStep = 1;
-    numTrials = 11;
-    n = 10000;
+    numTrials = 1;
+    n = 50000;
 
     for(int numThreads=threadMin; numThreads<=threadMax; numThreads+=threadStep){
         for(int curTrial=0; curTrial<numTrials; curTrial++){
