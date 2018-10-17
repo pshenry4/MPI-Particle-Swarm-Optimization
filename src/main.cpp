@@ -2,6 +2,26 @@
 #include <iostream>
 #include "CStopWatch.h"
 
+void serialCountSort(std::vector<int>& a){
+
+    std::vector<int> temp;
+    int n;
+
+    n = a.size();
+    temp.resize(n);
+    for(int i=0; i<n; i++){
+        count = 0;
+        for(int j=0; j<n; j++){
+            if(a[j] < a[i]){
+                count++;
+            }else if(a[j] == a[i] && j < i){
+                count++;
+            }
+        temp[count] = a[i];
+    }
+
+    a = temp;
+}
 
 int main(){
 
