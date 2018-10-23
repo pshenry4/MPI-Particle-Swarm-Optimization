@@ -5,9 +5,9 @@
 #include <unistd.h>
 #include <random>
 
-std::random_device rd;                         // only used once to initialise (seed) engine
-std::mt19937 rng(rd());                        // random-number engine used (Mersenne-Twister in this case)
-std::uniform_int_distribution<int> uni(0, 2000); // guaranteed unbiased
+std::random_device rd;                              // only used once to initialise (seed) engine
+std::mt19937 rng(rd());                             // random-number engine used (Mersenne-Twister in this case)
+std::uniform_int_distribution<int> uni(0, 2000);    // guaranteed unbiased
 
 std::vector<int> generateList(int n) {
 
@@ -28,17 +28,13 @@ void countSort(std::vector<int>& a){
     n = a.size();
     temp.resize(n);
 
-    #pragma omp parallel default(none) private(count) shared(n, a, temp)
-
-    #pragma omp for
+    // #pragma omp parallel default(none) private(count) shared(n, a, temp)
+    #pragma omp parallel for default(none) private(count) shared(n, a, temp)
     for(int i=0; i<n; i++){
         count = 0;
         for(int j=0; j<n; j++){
-            if(a[j] < a[i]){
-                count++;
-            }else if(a[j] == a[i] && j < i){
-                count++;
-            }
+            if(a[j] < a[i])                { count++;}
+            else if(a[j] == a[i] && j < i) { count++;}
         }
         temp[count] = a[i];
     }

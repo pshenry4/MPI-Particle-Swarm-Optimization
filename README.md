@@ -17,7 +17,7 @@ Follow these steps:
 
 5. `git remote add origin <URL_OF_YOUR_REPO>`. This adds a new remote that has the address of your repo.
 
-6. `git branch -m master`. This changes the name of the current branch (Template) to master.
+6. `git branch -m master`. This changes the name of the current branch (Reflection2) to master.
 
 6. `git push -u origin master`. This pushes your changes.
 
