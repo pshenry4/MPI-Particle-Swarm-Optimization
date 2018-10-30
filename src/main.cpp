@@ -1,71 +1,214 @@
-#include <omp.h>
 #include <iostream>
-#include "CStopWatch.h"
+#include <iomanip>
+#include <math.h>
+#include <cstdlib>
+#include <string>
 #include <vector>
-#include <unistd.h>
-#include <random>
+#include <fstream>
 
-std::random_device rd;                              // only used once to initialise (seed) engine
-std::mt19937 rng(rd());                             // random-number engine used (Mersenne-Twister in this case)
-std::uniform_int_distribution<int> uni(0, 2000);    // guaranteed unbiased
+#include "MersenneTwister.h"
+#include "CStopWatch.h"
 
-std::vector<int> generateList(int n) {
+using namespace std;
 
-    std::vector<int> retValue;
-    srandom(time(NULL));
-    for(int i = 0; i < n; i++){
-      retValue.push_back(uni(rng));
+typedef vector<int>       iArray1D;
+typedef vector<double>    ldArray1D;
+typedef vector<ldArray1D> ldArray2D;
+typedef vector<ldArray2D> ldArray3D;
+
+
+#define PI_F 3.141592654f
+
+double Rastrigin(ldArray2D &R, int Nd, int p){ // Rastrigin
+    double Z = 0, Xi;
+
+    for (int i = 0; i < Nd; i++){
+        Xi = R[p][i];
+        Z += (pow(Xi, 2) - 10 * cos(2 * PI_F * Xi) + 10);
     }
-
-    return retValue;
-} 
-
-void countSort(std::vector<int>& a){
-
-    std::vector<int> temp;
-    int n, count;
-
-    n = a.size();
-    temp.resize(n);
-
-    // #pragma omp parallel default(none) private(count) shared(n, a, temp)
-    #pragma omp parallel for default(none) private(count) shared(n, a, temp)
-    for(int i=0; i<n; i++){
-        count = 0;
-        for(int j=0; j<n; j++){
-            if(a[j] < a[i])                { count++;}
-            else if(a[j] == a[i] && j < i) { count++;}
-        }
-        temp[count] = a[i];
-    }
-
-    a = temp;
+    return -Z;
 }
 
-int main(){
+void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
+         double (*objFunc)(ldArray2D &, int, int), int &numEvals, string functionName)
+{
 
-    int threadMin, threadMax, threadStep;
-    int numTrials, n;
-    CStopWatch timer;
-    std::vector<int> result;
+    vector<vector<double>> R(Np, vector<double>(Nd, 0));
+    vector<vector<double>> V(Np, vector<double>(Nd, 0));
+    vector<double> M(Np, 0);
 
-    threadMin = 1; threadMax = 12; threadStep = 1;
-    numTrials = 1;
-    n = 50000;
+    ldArray2D pBestPosition(Np, vector<double>(Nd, -INFINITY));
+    ldArray1D pBestValue(Np, -INFINITY);
 
-    for(int numThreads=threadMin; numThreads<=threadMax; numThreads+=threadStep){
-        for(int curTrial=0; curTrial<numTrials; curTrial++){
-            
-            omp_set_num_threads(numThreads);
-            result = generateList(n);
-            timer.startTimer();
-            // Call functions here
-            countSort(result);
-            timer.stopTimer();
-            std::cout << numThreads << ", " << timer.getElapsedTime() << "\n";
-            result.clear();
+    ldArray1D gBestPosition(Nd, -INFINITY);
+    float gBestValue = -INFINITY;
+
+    int lastStep = Nt, bestTimeStep = 0;
+
+    MTRand mt;
+
+    float C1 = 2.05, C2 = 2.05;
+    float w, wMax = 0.9, wMin = 0.1;
+    float R1, R2;
+
+    CStopWatch timer, timer1;
+    float positionTime = 0, fitnessTime = 0, velocityTime = 0, totalTime = 0;
+
+    numEvals = 0;
+    timer1.startTimer();
+
+    // Init Population
+    for (int p = 0; p < Np; p++){
+        for (int i = 0; i < Nd; i++){
+            R[p][i] = xMin + mt.randDblExc(xMax - xMin);
+            V[p][i] = vMin + mt.randDblExc(vMax - vMin);
+
+            if (mt.rand() < 0.5){
+                R[p][i] = -R[p][i];
+                V[p][i] = -V[p][i];
+            }
         }
     }
-    
+
+    // Evaluate Fitness
+    for (int p = 0; p < Np; p++){
+        M[p] = objFunc(R, Nd, p);
+        numEvals++;
+    }
+
+    for (int j = 1; j < Nt; j++){
+
+        //Update Positions
+        timer.startTimer();
+        for (int p = 0; p < Np; p++){
+            for (int i = 0; i < Nd; i++){
+                R[p][i] = R[p][i] + V[p][i];
+
+                if (R[p][i] > xMax)
+                    R[p][i] = xMin + mt.randDblExc(xMax - xMin);
+                if (R[p][i] < xMin)
+                    R[p][i] = xMin + mt.randDblExc(xMax - xMin);
+            }
+        }
+        timer.stopTimer();
+        positionTime += timer.getElapsedTime();
+
+        // Evaluate Fitness
+        timer.startTimer();
+        for (int p = 0; p < Np; p++){
+            M[p] = objFunc(R, Nd, p);
+            numEvals++;
+        }
+
+        for (int p = 0; p < Np; p++){
+            if (M[p] > gBestValue){
+                gBestValue = M[p];
+                for (int i = 0; i < Nd; i++){
+                    gBestPosition[i] = R[p][i];
+                }
+                bestTimeStep = j;
+            }
+
+            // Local
+            if (M[p] > pBestValue[p]){
+                pBestValue[p] = M[p];
+                for (int i = 0; i < Nd; i++){
+                    pBestPosition[p][i] = R[p][i];
+                }
+            }
+        }
+        timer.stopTimer();
+        fitnessTime += timer.getElapsedTime();
+
+        if (gBestValue >= -0.0001){
+            lastStep = j;
+            break;
+        }
+
+        // Update Velocities
+        timer.startTimer();
+        w = wMax - ((wMax - wMin) / Nt) * j;
+        for (int p = 0; p < Np; p++){
+            for (int i = 0; i < Nd; i++){
+                R1 = mt.rand();
+                R2 = mt.rand();
+
+                // Original PSO
+                V[p][i] = w * V[p][i] + C1 * R1 * (pBestPosition[p][i] - R[p][i]) + C2 * R2 * (gBestPosition[i] - R[p][i]);
+                if (V[p][i] > vMax){ V[p][i] = vMin + mt.randDblExc(vMax - vMin);}
+                if (V[p][i] < vMin){ V[p][i] = vMin + mt.randDblExc(vMax - vMin);}
+            }
+        }
+        timer.stopTimer();
+        velocityTime += timer.getElapsedTime();
+    } // End Time Steps
+
+    timer1.stopTimer();
+    totalTime += timer1.getElapsedTime();
+
+    R.clear();
+    V.clear();
+    M.clear();
+    pBestPosition.clear();
+    pBestValue.clear();
+    gBestPosition.clear();
+
+    cout << functionName    << " "
+         << gBestValue      << " "
+         << Np              << " "
+         << Nd              << " "
+         << lastStep        << " "
+         << bestTimeStep    << ""
+         << numEvals        << " "
+         << positionTime    << " "
+         << fitnessTime     << " "
+         << velocityTime    << " "
+         << totalTime       << endl;
+}
+
+void runPSO(double xMin, double xMax, double vMin, double vMax,
+            double (*rPtr)(ldArray2D &, int, int), string functionName)
+{
+
+    int Np, Nd, Nt, numEvals;
+    int NdMin, NdMax, NdStep;
+    int NpMin, NpMax, NpStep;
+
+    NdMin  = 100;
+    NdMax  = 100;
+    NdStep = 10; // EXTRA CREDIT: Change NdMin to 10 and include results in evaluation for Extra Credit
+    NpMin  = 50;
+    NpMax  = 500;
+    NpStep = 50;
+    Nt = 3000;
+    Nd = 30;
+
+    for (Np = NpMin; Np <= NpMax; Np += NpStep){
+        for (Nd = NdMin; Nd <= NdMax; Nd += NdStep){
+            for (int curTrial = 0; curTrial < 10; curTrial++){
+                PSO(Np, Nd, Nt, xMin, xMax, vMin, vMax, rPtr, numEvals, functionName);
+            }
+            cout << endl;
+        }
+    }
+
+    cout << endl;
+}
+int main(){
+
+    double (*rPtr)(ldArray2D &, int, int) = NULL;
+    double xMin, xMax, vMin, vMax;
+
+    cout << "Function, Fitness, Np, Nd, lastStep, bestStep, Evals, Position Time, Fitness Time, Velocity Time, Total Time" << endl;
+
+    rPtr = &Rastrigin;
+    xMin = -5.12;
+    xMax = 5.12;
+    vMin = -1;
+    vMax = 1;
+    runPSO(xMin, xMax, vMin, vMax, rPtr, "F2");
+
+    rPtr = NULL;
+
     return 0;
 }
