@@ -1,5 +1,5 @@
-### OpenMP Template in C++ using OSC ###
-This is a basic template for OpenMP Reflection2 in CS 4170/5170
+### OpenMP Assignment #2 for CS 4170/5170 ###
+This is a basic template for OpenMP Assignment in CS 4170/5170
 
 ## Starting your own Repo ##
 
@@ -8,8 +8,8 @@ Follow these steps:
 1. Create your appropriately named repo on Gitlab.
 
 2. On your local computer: 
-    - if using SSH, run  `git clone -b Reflection2 --single-branch git@gitlab.com:rgreen13/openmp.git <DIRECTORY_NAME>`. 
-    - If using HTTPS, run `git clone -b Reflection2 --single-branch https://gitlab.com/rgreen13/openmp.git <DIRECTORY_NAME>`
+    - if using SSH, run  `git clone -b Assignment2 --single-branch git@gitlab.com:rgreen13/openmp.git <DIRECTORY_NAME>`. 
+    - If using HTTPS, run `git clone -b Assignment2 --single-branch https://gitlab.com/rgreen13/openmp.git <DIRECTORY_NAME>`
 
 3. `cd <DIRECTORY_NAME>`
 
@@ -17,7 +17,7 @@ Follow these steps:
 
 5. `git remote add origin <URL_OF_YOUR_REPO>`. This adds a new remote that has the address of your repo.
 
-6. `git branch -m master`. This changes the name of the current branch (Reflection2) to master.
+6. `git branch -m master`. This changes the name of the current branch (Assignment2) to master.
 
 6. `git push -u origin master`. This pushes your changes.
 
