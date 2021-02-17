@@ -5,8 +5,9 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <random>
 
-#include "MersenneTwister.h"
+// #include <omp.h>
 #include "CStopWatch.h"
 
 using namespace std;
@@ -16,8 +17,17 @@ typedef vector<double>    ldArray1D;
 typedef vector<ldArray1D> ldArray2D;
 typedef vector<ldArray2D> ldArray3D;
 
-
 #define PI_F 3.141592654f
+
+std::random_device rd;                          // only used once to initialise (seed) engine
+double randDbl(const double& min, const double& max) {
+    static thread_local mt19937* generator = nullptr;
+    if (!generator) {
+        generator = new mt19937(clock());
+    }
+    uniform_real_distribution<double> distribution(min, max);
+    return distribution(*generator);
+}
 
 double Rastrigin(ldArray2D &R, int Nd, int p){ // Rastrigin
     double Z = 0, Xi;
@@ -45,8 +55,6 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
 
     int lastStep = Nt, bestTimeStep = 0;
 
-    MTRand mt;
-
     float C1 = 2.05, C2 = 2.05;
     float w, wMax = 0.9, wMin = 0.1;
     float R1, R2;
@@ -60,13 +68,8 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
     // Init Population
     for (int p = 0; p < Np; p++){
         for (int i = 0; i < Nd; i++){
-            R[p][i] = xMin + mt.randDblExc(xMax - xMin);
-            V[p][i] = vMin + mt.randDblExc(vMax - vMin);
-
-            if (mt.rand() < 0.5){
-                R[p][i] = -R[p][i];
-                V[p][i] = -V[p][i];
-            }
+            R[p][i] = randDbl(xMin, xMax);
+            V[p][i] = randDbl(vMin, vMax);
         }
     }
 
@@ -84,10 +87,8 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
             for (int i = 0; i < Nd; i++){
                 R[p][i] = R[p][i] + V[p][i];
 
-                if (R[p][i] > xMax)
-                    R[p][i] = xMin + mt.randDblExc(xMax - xMin);
-                if (R[p][i] < xMin)
-                    R[p][i] = xMin + mt.randDblExc(xMax - xMin);
+                if (R[p][i] > xMax){ R[p][i] = randDbl(xMin, xMax);}
+                if (R[p][i] < xMin){ R[p][i] = randDbl(xMin, xMax);}
             }
         }
         timer.stopTimer();
@@ -130,13 +131,13 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
         w = wMax - ((wMax - wMin) / Nt) * j;
         for (int p = 0; p < Np; p++){
             for (int i = 0; i < Nd; i++){
-                R1 = mt.rand();
-                R2 = mt.rand();
+                R1 = randDbl(0, 1);
+                R2 = randDbl(0, 1);
 
                 // Original PSO
                 V[p][i] = w * V[p][i] + C1 * R1 * (pBestPosition[p][i] - R[p][i]) + C2 * R2 * (gBestPosition[i] - R[p][i]);
-                if (V[p][i] > vMax){ V[p][i] = vMin + mt.randDblExc(vMax - vMin);}
-                if (V[p][i] < vMin){ V[p][i] = vMin + mt.randDblExc(vMax - vMin);}
+                if (V[p][i] > vMax){ V[p][i] = vMin + randDbl(vMin, vMax);}
+                if (V[p][i] < vMin){ V[p][i] = vMin + randDbl(vMin, vMax);}
             }
         }
         timer.stopTimer();
@@ -158,7 +159,7 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
          << Np              << " "
          << Nd              << " "
          << lastStep        << " "
-         << bestTimeStep    << ""
+         << bestTimeStep    << " "
          << numEvals        << " "
          << positionTime    << " "
          << fitnessTime     << " "
