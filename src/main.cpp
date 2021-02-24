@@ -12,10 +12,10 @@
 
 using namespace std;
 
-typedef vector<int>       iArray1D;
-typedef vector<double>    ldArray1D;
-typedef vector<ldArray1D> ldArray2D;
-typedef vector<ldArray2D> ldArray3D;
+typedef std::vector<int>       iArray1D;
+typedef std::vector<double>    ldArray1D;
+typedef std::vector<ldArray1D> ldArray2D;
+typedef std::vector<ldArray2D> ldArray3D;
 
 #define PI_F 3.141592654f
 
@@ -43,19 +43,26 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
          double (*objFunc)(ldArray2D &, int, int), int &numEvals, string functionName)
 {
 
+    // The current position for each particle in the population
     vector<vector<double>> R(Np, vector<double>(Nd, 0));
+
+    // Current velocity of each particle in each dimension
     vector<vector<double>> V(Np, vector<double>(Nd, 0));
+
+    // Current Fitness for each particle
     vector<double> M(Np, 0);
 
+    // Personal Bests
     ldArray2D pBestPosition(Np, vector<double>(Nd, -INFINITY));
     ldArray1D pBestValue(Np, -INFINITY);
 
+    // Global Best
     ldArray1D gBestPosition(Nd, -INFINITY);
     float gBestValue = -INFINITY;
 
     int lastStep = Nt, bestTimeStep = 0;
 
-    float C1 = 2.05, C2 = 2.05;
+    float C1 = 1.45, C2 = 1.45;
     float w, wMax = 0.9, wMin = 0.1;
     float R1, R2;
 
@@ -83,10 +90,11 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
 
         //Update Positions
         timer.startTimer();
-        for (int p = 0; p < Np; p++){
-            for (int i = 0; i < Nd; i++){
-                R[p][i] = R[p][i] + V[p][i];
+        for (int p = 0; p < Np; p++){ // Particle
+            for (int i = 0; i < Nd; i++){ // Dimension
+                R[p][i] = R[p][i] + V[p][i]; // Update my position
 
+                // Corrects a particle if it's outside the bounds
                 if (R[p][i] > xMax){ R[p][i] = randDbl(xMin, xMax);}
                 if (R[p][i] < xMin){ R[p][i] = randDbl(xMin, xMax);}
             }
@@ -101,6 +109,7 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
             numEvals++;
         }
 
+        // Global & Personal Bests
         for (int p = 0; p < Np; p++){
             if (M[p] > gBestValue){
                 gBestValue = M[p];
@@ -136,8 +145,8 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
 
                 // Original PSO
                 V[p][i] = w * V[p][i] + C1 * R1 * (pBestPosition[p][i] - R[p][i]) + C2 * R2 * (gBestPosition[i] - R[p][i]);
-                if (V[p][i] > vMax){ V[p][i] = vMin + randDbl(vMin, vMax);}
-                if (V[p][i] < vMin){ V[p][i] = vMin + randDbl(vMin, vMax);}
+                if (V[p][i] > vMax){ V[p][i] = randDbl(vMin, vMax);}
+                if (V[p][i] < vMin){ V[p][i] = randDbl(vMin, vMax);}
             }
         }
         timer.stopTimer();
@@ -171,6 +180,9 @@ void runPSO(double xMin, double xMax, double vMin, double vMax,
             double (*rPtr)(ldArray2D &, int, int), string functionName)
 {
 
+    // Np = Population size
+    // Nd = # of  Dimensions
+    // Nt = Number of iterations
     int Np, Nd, Nt, numEvals;
     int NdMin, NdMax, NdStep;
     int NpMin, NpMax, NpStep;
@@ -181,7 +193,7 @@ void runPSO(double xMin, double xMax, double vMin, double vMax,
     NpMin  = 50;
     NpMax  = 500;
     NpStep = 50;
-    Nt = 3000;
+    Nt = 6000;
     Nd = 30;
 
     for (Np = NpMin; Np <= NpMax; Np += NpStep){
@@ -203,10 +215,11 @@ int main(){
     cout << "Function, Fitness, Np, Nd, lastStep, bestStep, Evals, Position Time, Fitness Time, Velocity Time, Total Time" << endl;
 
     rPtr = &Rastrigin;
-    xMin = -5.12;
-    xMax = 5.12;
-    vMin = -1;
-    vMax = 1;
+    xMin = -5.12;   // Lower Bound
+    xMax = 5.12;    // Upper Bound
+    vMin = -1;      // Minimum Velocity
+    vMax = 1;       // Maximum Velocity
+
     runPSO(xMin, xMax, vMin, vMax, rPtr, "F2");
 
     rPtr = NULL;
