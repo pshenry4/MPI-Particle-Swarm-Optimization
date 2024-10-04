@@ -23,7 +23,7 @@ std::random_device rd;                          // only used once to initialise 
 double randDbl(const double& min, const double& max) {
     static thread_local mt19937* generator = nullptr;
     if (!generator) {
-        generator = new mt19937(clock());
+        generator = new mt19937(10);
     }
     uniform_real_distribution<double> distribution(min, max);
     return distribution(*generator);
@@ -180,30 +180,21 @@ void runPSO(double xMin, double xMax, double vMin, double vMax,
             double (*rPtr)(ldArray2D &, int, int), string functionName)
 {
 
+    srand(10);
     // Np = Population size
     // Nd = # of  Dimensions
     // Nt = Number of iterations
     int Np, Nd, Nt, numEvals;
-    int NdMin, NdMax, NdStep;
-    int NpMin, NpMax, NpStep;
+    Np = 100;
+    Nt = 10000;
+    Nd = 100;
 
-    NdMin  = 100;
-    NdMax  = 100;
-    NdStep = 10; // EXTRA CREDIT: Change NdMin to 10 and include results in evaluation for Extra Credit
-    NpMin  = 50;
-    NpMax  = 500;
-    NpStep = 50;
-    Nt = 6000;
-    Nd = 30;
-
-    for (Np = NpMin; Np <= NpMax; Np += NpStep){
-        for (Nd = NdMin; Nd <= NdMax; Nd += NdStep){
-            for (int curTrial = 0; curTrial < 10; curTrial++){
-                PSO(Np, Nd, Nt, xMin, xMax, vMin, vMax, rPtr, numEvals, functionName);
-            }
-            cout << endl;
-        }
+    
+    for (int curTrial = 0; curTrial < 10; curTrial++){
+        PSO(Np, Nd, Nt, xMin, xMax, vMin, vMax, rPtr, numEvals, functionName);
     }
+    cout << endl;
+    
 
     cout << endl;
 }

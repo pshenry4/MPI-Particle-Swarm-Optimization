@@ -1,12 +1,12 @@
 #CC = g++
 UNAME := $(shell uname)
 ifeq ($(UNAME),Darwin)
-	CC = g++-8
+	CC = g++-14
 else
 	CC = g++
 endif
 LIBS = 
-CFLAGS =-O2 -g -Wall -c -fmessage-length=0 -std=c++11
+CFLAGS =-O2 -g -Wall -c -fmessage-length=0 -std=c++17
 OPENMP = -fopenmp
 
 RM := rm -rf
