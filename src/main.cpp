@@ -285,11 +285,6 @@ int main(){
     // Defined current rank for each process
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-    // Have only master output
-    if (myRank == 0){
-        cout << "Processes, Function, Fitness, Np, Nd, lastStep, bestStep, Evals, Position Time, Fitness Time, Velocity Time, Total Time" << endl;
-    }
-
     rPtr = &Rastrigin;
     xMin = -5.12;   // Lower Bound
     xMax = 5.12;    // Upper Bound
