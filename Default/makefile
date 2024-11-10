@@ -1,19 +1,18 @@
-#CC = g++
-UNAME := $(shell uname)
-ifeq ($(UNAME),Darwin)
-	CC = g++-14
-else
-	CC = g++
-endif
+CC = mpicxx
 LIBS = 
 CFLAGS =-O2 -g -Wall -c -fmessage-length=0 -std=c++17
-OPENMP = -fopenmp
 
 RM := rm -rf
 
-TARGET  = "OpenMP"
+TARGET  = "MPI"
 
-INCLUDE = -I../src
+UNAME := $(shell uname)
+ifeq ($(UNAME),Darwin)
+	INCLUDE = -I../src -I/usr/local/include/boost/
+else
+	INCLUDE = -I../src -I$(MPI_CXXFLAGS)
+endif
+
 
 SUBDIRS  	 := $(wildcard ../) $(wildcard ../*/)
 CPP_SRCS 	 := $(wildcard ../*/*.cpp) $(wildcard ../*/*/*.cpp) 
@@ -23,13 +22,13 @@ CPP_DEPS := $(patsubst ../%.cpp, ./%.d, $(CPP_SRCS))
 
 
 # All Target
-all: PSO
+all: MPI
 
 # Tool invocations
-PSO: $(OBJS) $(USER_OBJS)
+MPI: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	$(CC) -o $(TARGET) $(OPENMP) $(ARCH) $(OBJS) $(LIBS) 
+	$(CC) -o $(TARGET) $(ARCH) $(OBJS) $(LIBS) 
 	@echo 'Finished building target: $@'
 	@echo ' '
 
