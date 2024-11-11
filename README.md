@@ -8,7 +8,7 @@ My work for our Assignment #2 parallelizes the particle swarm optimization algor
 The particle swarm optimization algorithm at a high-level is an iterative algorithm that looks for one candidate solution point on a plane for all other points to "flock" to. This algorithm imitates the process of bird flocking or fish schooling in terms of a real-life scenario. 
 Regarding the algorithm itself, there first needs to be a population that is defined/created. The particle swarm optimization do this through iterating through each "particle" or entity in the population to get the Rastrigin fitness regarding its particle number and the number of dimensions that are being analyzed. The Rastrigin function is defined as
 
-$$ fitness = \sum_{i=1}^{n} \left(\text{pow}(X_i, 2) - 10 \cdot \cos(2 \cdot \pi \cdot X_i) + 10\right)
+$$ fitness = \sum_{i=1}^{n} \left(\text{pow}(X_i, 2) - 10 \cdot \cos(2 \cdot \pi \cdot X_i) + 10\right) $$
 
 ## Parallelization Methodology ##
 
