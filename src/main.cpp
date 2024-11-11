@@ -228,6 +228,7 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
     // Get the correct number of evals by summing up all of the processes loval values
     MPI_Allreduce(&myEvals, &numEvals, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
+    // Have only master process time all work 
     if (myRank == 0) {
         timer1.stopTimer();
         totalTime += timer1.getElapsedTime();
@@ -242,17 +243,17 @@ void PSO(int Np, int Nd, int Nt, float xMin, float xMax, float vMin, float vMax,
 
     // Have only master process output the results
     if (myRank == 0){
-        cout << numProcs << " "
-            << functionName    << " "
-            << gBestValue      << " "
-            << Np              << " "
-            << Nd              << " "
-            << lastStep        << " "
-            << bestTimeStep    << " "
-            << numEvals        << " "
-            << positionTime    << " "
-            << fitnessTime     << " "
-            << velocityTime    << " "
+        cout << numProcs << ", "
+            << functionName    << ", "
+            << gBestValue      << ", "
+            << Np              << ", "
+            << Nd              << ", "
+            << lastStep        << ", "
+            << bestTimeStep    << ", "
+            << numEvals        << ", "
+            << positionTime    << ", "
+            << fitnessTime     << ", "
+            << velocityTime    << ", "
             << totalTime       << endl;
     }
 
