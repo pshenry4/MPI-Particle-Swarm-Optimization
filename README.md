@@ -1,8 +1,8 @@
-### MPI Assignment #2, CS 4170/5170, Name: Parker Henry ###
+### Particle Swarm Optimization Using MPI to Parallelize ###
 
 
 ## Summary ##
-My work for our Assignment #2 parallelizes the particle swarm optimization algorithm through using the OpenMPI library. This library helps us parallelize our programs by adding and configuring how processes communicate with each other, rather than how threads communicate with each other to execute a program in parallel. After determining a solution regarding the code, I ran 1-12 processes, each with 10 trails to obtain valid data for all runs of the program. This data helped me then plot the performance-tracking metrics that are described later in this README file. 
+My work for this assignment parallelizes the particle swarm optimization algorithm through using the OpenMPI library. This library helps us parallelize our programs by adding and configuring how processes communicate with each other, rather than how threads communicate with each other to execute a program in parallel. After determining a solution regarding the code, I ran 1-12 processes, each with 10 trails to obtain valid data for all runs of the program. This data helped me then plot the performance-tracking metrics that are described later in this README file. 
 
 ## Algorithm Overview ##
 The particle swarm optimization algorithm at a high-level is an iterative algorithm that looks for one candidate solution point on a plane for all other points to "flock" to. This algorithm imitates the process of bird flocking or fish schooling in terms of a real-life scenario. 
